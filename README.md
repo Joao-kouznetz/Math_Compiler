@@ -150,22 +150,3 @@ $$ \mathrm{fib}(n) =
   n, & n \le 1,\\
   \mathrm{fib}(n-1) + \mathrm{fib}(n-2), & \text{caso contrário.}
 \end{cases}$$
-
-### 12.
-```
-def sum_to(n): {
-  i = 1
-  s = 0
-  while (i <= n): {
-    s = s + i
-    i = i + 1
-  }
-  return s
-}
-```
-$$\mathrm{sum\_to}(n):
-\begin{cases}
-  i = 1,\,s = 0;\\
-  \text{enquanto }i\le n:\;s\leftarrow s+i,\;i\leftarrow i+1;\\
-  \text{retorna }s
-\end{cases}$$
