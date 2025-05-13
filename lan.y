@@ -32,7 +32,8 @@ program:
   | program top_item NEWLINE
   | program top_item        /* <-- permite fechar sem \n final */
   ;
-  
+
+
 top_item:
     statement
   | FUNC_BLOCK
@@ -49,10 +50,15 @@ statement:
 FUNC_BLOCK:
     T_DEF T_IDENT '(' opt_params ')' ':' BLOCK
   ;
-
+/* 2 Regra auxiliar para opcionalizar um \n */
+opt_nl:
+    /* vazio */
+  | NEWLINE
+  ;
+  
 /* blocos em chaves, com pelo menos um \n antes de statements */
 BLOCK:
-    '{' NEWLINE stmt_list '}'
+    '{' NEWLINE stmt_list '}'  opt_nl
   ;
 
 /* lista de statements, aceita zero ou mais */
@@ -113,7 +119,7 @@ FACT:
   | T_IDENT '(' opt_args ')'      /* chamada genérica */
   | '(' EXPR ')'
   | T_SQRT '(' EXPR ')'
-  | T_SUM '(' T_IDENT ',' T_IDENT ',' T_IDENT ',' EXPR ')'  /* sum(i,a,b,EXPR) */
+  | T_SUM '(' T_IDENT ',' EXPR ',' EXPR ',' EXPR ')'  /* sum(i,a,b,EXPR) */
   | EXPR '^' T_NUMBER
   ;
 
