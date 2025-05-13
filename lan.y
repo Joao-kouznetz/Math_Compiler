@@ -29,6 +29,7 @@ void  yyerror(const char *s);
 /* programa = zero ou mais top_items que terminam em NEWLINE */
 program:
     /* vazio */
+  | program NEWLINE 
   | program top_item NEWLINE
   | program top_item        /* <-- permite fechar sem \n final */
   ;
@@ -58,12 +59,13 @@ opt_nl:
   
 /* blocos em chaves, com pelo menos um \n antes de statements */
 BLOCK:
-    '{' NEWLINE stmt_list '}'  opt_nl
+    '{' opt_nl stmt_list '}'  opt_nl
   ;
 
 /* lista de statements, aceita zero ou mais */
 stmt_list:
     /* vazio */
+  | stmt_list NEWLINE
   | stmt_list statement NEWLINE
   ;
 
