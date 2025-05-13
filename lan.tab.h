@@ -52,7 +52,9 @@
      T_GE = 268,
      T_EQ = 269,
      T_NE = 270,
-     NEWLINE = 271
+     NEWLINE = 271,
+     T_AND = 272,
+     T_OR = 273
    };
 #endif
 /* Tokens.  */
@@ -70,6 +72,8 @@
 #define T_EQ 269
 #define T_NE 270
 #define NEWLINE 271
+#define T_AND 272
+#define T_OR 273
 
 
 
@@ -82,7 +86,7 @@ typedef union YYSTYPE
   char  *str;
 }
 /* Line 1529 of yacc.c.  */
-#line 86 "lan.tab.h"
+#line 90 "lan.tab.h"
 	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1

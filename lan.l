@@ -28,6 +28,8 @@ DIGIT    [0-9]
 "while"                        return T_WHILE;
 "sum"                          return T_SUM;
 "sqrt"                         return T_SQRT;
+"and"                          return T_AND;
+"or"                           return T_OR;
 
 "<="                           return T_LE;
 ">="                           return T_GE;

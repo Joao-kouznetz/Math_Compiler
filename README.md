@@ -3,34 +3,38 @@
 # EBNF
 
 ```
-FUNC_BLOCK  = "def", IDENTIFIER, "(", [ PARAMS ], ")", ":", BLOCK ;
-BLOCK       = "{", "\n", { STATEMENT }, "}" ;
-STATEMENT   = ( ASSIGN  
-              | IF  
-              | RETURN
-              | WHILE
-              ), "\n" ;
-
-ASSIGN      = IDENTIFIER, "=", EXPR ;
-RETURN      = "return", EXPR ;
-IF          = "if", "(", EXPR, ")", ":", BLOCK, [ "else", ":", BLOCK ] ;
-WHILE       = "while", "(", EXPR, ")", ":", BLOCK ;
-PARAMS      = IDENTIFIER, { ",", IDENTIFIER } ;
-EXPR        = SUM
-            | TERM, { ("+" | "-"), TERM } ;
-SUM         = "sum", "(", "i", ",", "a", ",", "b", ",", EXPR, ")" ;
-TERM        = FACT, { ("*" | "/"), FACT } ;
-FACT        = NUMBER
-            | IDENTIFIER
-            | IDENTIFIER, "(", [ ARG ], ")"
-            | "(", EXPR, ")"
-            | "sqrt", "(", EXPR, ")"
-            | EXPR, "^", "2" ;
-ARG         = EXPR, { ",", EXPR } ;
-IDENTIFIER  = LETTER, { LETTER | DIGIT | "_" } ;
-NUMBER      = DIGIT, { DIGIT } ;
-LETTER      = "a" | … | "z" | "A" | … | "Z" ;
-DIGIT       = "0" | "1" | … | "9" ;
+FUNC_BLOCK    = "def" IDENTIFIER "(" [ PARAMS ] ")" ":" BLOCK ;
+BLOCK         = "{" "\n" { STATEMENT } "}" ;
+STATEMENT     = ( ASSIGN
+                | IF
+                | RETURN
+                | WHILE
+                ) "\n" ;
+ASSIGN        = IDENTIFIER "=" EXPR ;
+RETURN        = "return" EXPR ;
+IF            = "if" "(" BIEXPRESSION ")" ":" BLOCK [ "else" ":" BLOCK ] ;
+WHILE         = "while" "(" BIEXPRESSION ")" ":" BLOCK ;
+PARAMS        = IDENTIFIER { "," IDENTIFIER } ;
+  
+EXPR          = TERM { ("+" | "-") TERM } ;
+TERM          = FACT { ("*" | "/") FACT } ;
+FACT          = NUMBER
+              | IDENTIFIER [ "(" [ ARG ] ")" ]
+              | "(" EXPR ")"
+              | "sqrt" "(" EXPR ")"
+              | SUM
+              | EXPR "^" NUMBER ;
+SUM           = "sum" "(" EXPR "," EXPR "," EXPR "," EXPR ")" ;
+ARG           = EXPR { "," EXPR } ;
+  
+BIEXPRESSION  = BITERM { "or" BITERM } ;
+BITERM        = RELEXPRESSION { "and" RELEXPRESSION } ;
+RELEXPRESSION = EXPR { ("==" | "!=" | "<" | ">" | "<=" | ">=") EXPR } ;
+  
+IDENTIFIER    = LETTER { LETTER | DIGIT | "_" } ;
+NUMBER        = DIGIT { DIGIT } ;
+LETTER        = "a" | … | "z" | "A" | … | "Z" ;
+DIGIT         = "0" | … | "9" ;
 
 ```
 
@@ -90,15 +94,17 @@ $$y =
 
 ### 6.
 ```
-def sum1(n):
+def sum1(n): {
     return sum(i,1,n,i)
+    }
 ```
 $$ \mathrm{sum1}(n)=\sum_{i=1}^{n}i$$
 
 ### 7.
 ```
-def sumsq(n):
+def sumsq(n):{
     return sum(i,1,n,i*i)
+}
 ```
 $$ \mathrm{sumsq}(n)=\sum_{i=1}^{n}i^{2}$$
 

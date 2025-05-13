@@ -19,7 +19,11 @@ void  yyerror(const char *s);
 %token       T_DEF T_RETURN T_IF T_ELSE T_WHILE T_SUM T_SQRT
 %token       T_LE T_GE T_EQ T_NE
 %token       NEWLINE
+%token       T_AND T_OR
 
+%left T_OR
+%left T_AND
+%left '<' '>' T_LE T_GE T_EQ T_NE
 %left '+' '-'
 %left '*' '/'
 %right '^'
@@ -79,7 +83,7 @@ RETURN:
   ;
 
 IF:
-    T_IF '(' EXPR ')' ':' BLOCK opt_else
+    T_IF '(' BIEXPR ')' ':' BLOCK opt_else
   ;
 
 opt_else:
@@ -88,7 +92,7 @@ opt_else:
   ;
 
 WHILE:
-    T_WHILE '(' EXPR ')' ':' BLOCK
+    T_WHILE '(' BIEXPR ')' ':' BLOCK
   ;
 
 /* parâmetros opcionais */
@@ -99,6 +103,27 @@ opt_params:
 PARAMS:
     T_IDENT
   | PARAMS ',' T_IDENT
+  ;
+
+BIEXPR:
+    BITERM
+  | BIEXPR T_OR BITERM
+  ;
+
+BITERM:
+    RELEXPR
+  | BITERM T_AND RELEXPR
+  ;
+
+/* restabeleça RELEXPR, EXPR, etc. iguais ao que já tinha */
+RELEXPR:
+    EXPR
+  | RELEXPR '<'  EXPR
+  | RELEXPR '>'  EXPR
+  | RELEXPR T_LE EXPR
+  | RELEXPR T_GE EXPR
+  | RELEXPR T_EQ EXPR
+  | RELEXPR T_NE EXPR
   ;
 
 /* expressões aritméticas */
