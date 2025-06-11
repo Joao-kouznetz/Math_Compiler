@@ -29,7 +29,8 @@
   X(PERCENT)      \
   X(NOT_EQUAL)    \
   X(CIRCUMFLEX)   \
-  X(NEWLINE)
+  X(NEWLINE)      \
+  X(DEF)
 
 // gera o enum
 typedef enum {

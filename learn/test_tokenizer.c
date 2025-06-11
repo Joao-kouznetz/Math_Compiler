@@ -13,7 +13,7 @@ void print_word(const char *tokname , const char *token)
 int main(void)
 {
 	token_callback(
-        "while ( 9129821 ola ): {}\n", &print_word
+        "\n def () :{while ( 9129821 ola ): {}}\n", &print_word
 	);
 	return 0;
 }

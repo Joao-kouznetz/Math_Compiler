@@ -41,6 +41,7 @@
 ">"             { return GREATER; }
 "%"             { return PERCENT; }
 "^"             { return CIRCUMFLEX; }
+"def"           { return DEF;     }
 
 [0-9]+          { return NUM; }
 [A-Za-z_][A-Za-z0-9_]* { return IDENT; }
