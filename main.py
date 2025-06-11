@@ -23,7 +23,7 @@ class SymbolTable:
             if self.table[key][0][0] == "func":
                 tipo = "func"
                 pass
-            if self.table[key][0][0] == "func" or isinstance(value, int):
+            if self.table[key][0][0] == "func" or True:
                 self.table[key][1] = value
         elif self.parent:
             self.parent.set_keyValue(key, value)

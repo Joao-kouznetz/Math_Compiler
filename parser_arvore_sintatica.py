@@ -1,5 +1,6 @@
 from tokenizer import Tokenizer
 import re
+from latex import render_latex
 
 
 class PrePro:
@@ -248,7 +249,7 @@ class Ident(Node):
         return st.get_keyValue(self.value)
 
     def latexate(self, st):
-        return self.value
+        return st.get_keyValue(self.value)[1]
 
 
 class Print(Node):
@@ -407,18 +408,32 @@ class FuncDec(Node):
         else:
             params = []
         bloco = no_function.children[-1]
-
-        new_st = st.push_scope()
-        lista_ident_entrada = []
-        for index in range(len(params)):
-            # param é o que esta recebendo
-            param_node = params[index]
-            tipo = "int"
-            ident = param_node.children[0].value
-            lista_ident_entrada.append(ident)
-            new_st.set_defineKeyType(ident, tipo)
-            new_st.set_keyValue(ident, str(ident))
-        resultado = bloco.latexate(new_st)
+        if len(self.children) != len(params):
+            new_st = st.push_scope()
+            lista_ident_entrada = []
+            for index in range(len(params)):
+                # param é o que esta recebendo
+                param_node = params[index]
+                tipo = "int"
+                ident = param_node.children[0].value
+                lista_ident_entrada.append(ident)
+                new_st.set_defineKeyType(ident, tipo)
+                new_st.set_keyValue(ident, str(ident))
+            resultado = bloco.latexate(new_st)
+        else:
+            new_st = st.push_scope()
+            for index in range(len(params)):
+                # param é o que esta recebendo
+                param_node = params[index]
+                tipo = param_node.value
+                ident = param_node.children[0].value
+                arg_node = self.children[index]
+                valor = arg_node.evaluate(st=st)[1]
+                # param_node.children.append(arg_node)
+                # param_node.evaluate(st=st)
+                new_st.set_defineKeyType(ident, tipo)
+                new_st.set_keyValue(ident, valor)
+            resultado = bloco.latexate(new_st)
 
         parametros = ", ".join(lista_ident_entrada)
         return "$$ " + func_name + "(" + parametros + ")" + " = " + resultado + " $$"
@@ -968,5 +983,7 @@ class Parser:
                 child_texts.append(node.latexate(st=st))
 
         resultado = child_texts
+        for idx, formula in enumerate(resultado, start=1):
+            render_latex(formula, output_pdf=f"formula_{idx}.pdf")
         print(resultado)
         return resultado
