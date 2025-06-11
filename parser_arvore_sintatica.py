@@ -27,7 +27,7 @@ class Node:
     def evaluate(self, st):
         pass
 
-    def latlatexate(self, st):
+    def latlatexate(self, st, cond="normal"):
         pass
 
 
@@ -325,9 +325,10 @@ class Assigment(Node):
         ident = self.children[0].value
         if cond == "ident":
             expr = ident + " = " + self.children[1].latexate(st, cond=cond)
+            return expr
         else:
             expr = self.children[1].latexate(st, cond=cond)
-        st.set_keyValue(key=ident, value=expr)
+            st.set_keyValue(key=ident, value=expr)
 
 
 class While(Node):
@@ -366,13 +367,17 @@ class If(Node):
             if resultado is not None:
                 return resultado
 
-    def latexate(self, st):
-        cond = self.children[0].latexate()
-        then = self.children[1].children[0].latexate()
+    def latexate(self, st, cond="normal"):
+        cond = self.children[0].latexate(st, cond="ident")
+        then = ""
+        for child in self.children[1].children:
+            then += str(child.latexate(st, cond="ident"))
         parts = [rf"{then}, & {cond},\\"]
         if len(self.children) > 2:
-            els = self.children[2].children[0].latexate()
-            parts.append(rf"{els}, & \text{{caso contrário.}}\\")
+            elses = ""
+            for childs in self.children[2].children:
+                elses += str(childs.latexate(st, cond="ident"))
+            parts.append(rf"{elses}, & \text{{caso contrário.}}\\")
         cases = "\n".join(parts)
         return rf"""\begin{{cases}}{cases}\end{{cases}}"""
 
