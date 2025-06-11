@@ -157,9 +157,9 @@ class BinOp(Node):
             # Erro Semântico operação invalida ?
             raise ValueError(f"Operador '{self.value}' inválido")
 
-    def latexate(self, st):
-        left = self.children[0].latexate(st)
-        right = self.children[1].latexate(st)
+    def latexate(self, st, cond="normal"):
+        left = self.children[0].latexate(st, cond)
+        right = self.children[1].latexate(st, cond)
         op = {
             "+": " + ",
             "-": " - ",
@@ -197,11 +197,11 @@ class UnOp(Node):
             # Erro Semântico realizando operação invalida?
             raise ValueError(f"Operador '{self.value}' inválido")
 
-    def latexate(self, st):
+    def latexate(self, st, cond="normal"):
         operand = (
-            self.children[0].latexate(st)
+            self.children[0].latexate(st, cond)
             if hasattr(self.children[0], "latexate")
-            else self.children[0].latexate(st)
+            else self.children[0].latexate(st, cond)
         )
         if self.value == "!":
             return r"\lnot " + operand
@@ -214,7 +214,7 @@ class IntVal(Node):
     def evaluate(self, st):
         return ["int", self.value]
 
-    def latexate(self, st):
+    def latexate(self, st, cond="normal"):
         return str(self.value)
 
 
@@ -238,7 +238,7 @@ class NoOp(Node):
     def evaluate(self, st):
         return 0
 
-    def latexate(self, st):
+    def latexate(self, st, cond="normal"):
         return ""
 
 
@@ -248,8 +248,11 @@ class Ident(Node):
     def evaluate(self, st):
         return st.get_keyValue(self.value)
 
-    def latexate(self, st):
-        return st.get_keyValue(self.value)[1]
+    def latexate(self, st, cond="normal"):
+        if cond == "ident":
+            return self.value
+        else:
+            return st.get_keyValue(self.value)[1]
 
 
 class Print(Node):
@@ -283,8 +286,8 @@ class Block(Node):
                     # Propaga retornos de return aninhados (ex: vindo de if/while)
                     return result
 
-    def latexate(self, st):
-        parts = [child.latexate(st) for child in self.children]
+    def latexate(self, st, cond="normal"):
+        parts = [child.latexate(st, cond=cond) for child in self.children]
         return "\n".join(p for p in parts if p)
 
 
@@ -301,11 +304,11 @@ class Dec(Node):
             valor = self.children[1].evaluate(st=st)[1]
             st.set_keyValue(key=identifier, value=valor)
 
-    def latexate(self, st):
+    def latexate(self, st, cond="normal"):
         ident = self.children[0].value
         st.set_defineKeyType(key=ident, type="int")
         if len(self.children) > 1:
-            expr = self.children[1].latexate(st)
+            expr = self.children[1].latexate(st, cond=cond)
             st.set_keyValue(key=ident, value=expr)
 
 
@@ -318,9 +321,12 @@ class Assigment(Node):
         identifier = self.children[0].value
         st.set_keyValue(key=identifier, value=valor)
 
-    def latexate(self, st):
+    def latexate(self, st, cond="normal"):
         ident = self.children[0].value
-        expr = self.children[1].latexate(st)
+        if cond == "ident":
+            expr = ident + " = " + self.children[1].latexate(st, cond=cond)
+        else:
+            expr = self.children[1].latexate(st, cond=cond)
         st.set_keyValue(key=ident, value=expr)
 
 
@@ -338,10 +344,10 @@ class While(Node):
             if resultado is not None:
                 return resultado
 
-    def latexate(self, st):
-        cond = self.children[0].latexate(st)
-        body = self.children[1].latexate(st)
-        return r"\mathbf{while}\ " + cond + r"\ do\ " + body
+    def latexate(self, st, cond="normal"):
+        cond = self.children[0].latexate(st, "ident")
+        body = self.children[1].latexate(st, "ident")
+        return f"\\text" + "{" + "enquanto" + "}" + cond + f"\\leftarrow" + body
 
 
 class If(Node):
@@ -391,7 +397,7 @@ class FuncDec(Node):
             self,
         )
 
-    def latexate(self, st):
+    def latexate(self, st, cond="normal"):
         func_name = self.children[0].value
         return_tipo = self.value
         st.set_defineKeyType(func_name, ["func", return_tipo])
@@ -419,7 +425,7 @@ class FuncDec(Node):
                 lista_ident_entrada.append(ident)
                 new_st.set_defineKeyType(ident, tipo)
                 new_st.set_keyValue(ident, str(ident))
-            resultado = bloco.latexate(new_st)
+            resultado = bloco.latexate(new_st, cond)
         else:
             new_st = st.push_scope()
             for index in range(len(params)):
@@ -433,7 +439,7 @@ class FuncDec(Node):
                 # param_node.evaluate(st=st)
                 new_st.set_defineKeyType(ident, tipo)
                 new_st.set_keyValue(ident, valor)
-            resultado = bloco.latexate(new_st)
+            resultado = bloco.latexate(new_st, cond)
 
         parametros = ", ".join(lista_ident_entrada)
         return "$$ " + func_name + "(" + parametros + ")" + " = " + resultado + " $$"
@@ -490,7 +496,7 @@ class FuncCall(Node):
         if retorno != "void":
             raise TypeError("era para a sua funcao estar retornando e não esta.")
 
-    def latexate(self, st):
+    def latexate(self, st, cond="normal"):
         nome_fun = self.value
         lista_function = st.get_keyValue(nome_fun)
         retorno = lista_function[0][1]
@@ -511,12 +517,12 @@ class FuncCall(Node):
             tipo = param_node.value
             ident = param_node.children[0].value
             arg_node = self.children[index]
-            valor = arg_node.latexate(st=st)
+            valor = arg_node.latexate(st=st, cond=cond)
             # param_node.children.append(arg_node)
             # param_node.evaluate(st=st)
             new_st.set_defineKeyType(ident, tipo)
             new_st.set_keyValue(ident, valor)
-        resultado = bloco.latexate(new_st)
+        resultado = bloco.latexate(new_st, cond=cond)
         return resultado
 
 
@@ -526,8 +532,8 @@ class Return(Node):
     def evaluate(self, st):
         return self.children[0].evaluate(st=st)
 
-    def latexate(self, st):
-        expr = self.children[0].latexate(st)
+    def latexate(self, st, cond="normal"):
+        expr = self.children[0].latexate(st, cond)
         return expr
 
 

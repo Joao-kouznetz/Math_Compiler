@@ -1,6 +1,5 @@
 
-def sq(x) {
- var l=10 * 30
- x = (3+ 5) + l  
- return x
+def sq(x,y) {
+ x = 5 + 3  
+ return x*x+ y
 }

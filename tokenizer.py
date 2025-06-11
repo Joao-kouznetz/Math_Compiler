@@ -187,7 +187,7 @@ class Tokenizer:
                 token = Token("PRINT", None)
                 self.next = token  # Atualiza 'next' com o número encontrado
                 return token
-            elif value == "for":
+            elif value == "while":
                 token = Token("FOR", None)
                 self.next = token
                 return token
