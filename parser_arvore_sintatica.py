@@ -303,10 +303,10 @@ class Dec(Node):
 
     def latexate(self, st):
         ident = self.children[0].value
+        st.set_defineKeyType(key=ident, type="int")
         if len(self.children) > 1:
             expr = self.children[1].latexate(st)
-            return f"{ident} : {self.value} = {expr}"
-        return f"{ident} : {self.value}"
+            st.set_keyValue(key=ident, value=expr)
 
 
 class Assigment(Node):
@@ -321,7 +321,7 @@ class Assigment(Node):
     def latexate(self, st):
         ident = self.children[0].value
         expr = self.children[1].latexate(st)
-        return f"{ident} = {expr}"
+        st.set_keyValue(key=ident, value=expr)
 
 
 class While(Node):
