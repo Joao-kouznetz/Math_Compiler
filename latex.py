@@ -3,21 +3,25 @@ import os
 
 
 def render_latex(formula: str, output_pdf: str = "output.pdf"):
+    # … remove delimitadores $$ … $$ se houver …
     if formula.startswith("$$") and formula.endswith("$$"):
         formula = formula[2:-2]
 
+    # agora SIM criamos o tex_code como raw string,
+    # preservando o '\' de '\times'
     tex_code = rf"""
-    \documentclass{{article}}
-    \usepackage[margin=0pt]{{geometry}}
-    \usepackage{{amsmath}}
-    \pagestyle{{empty}}
-    \begin{{document}}
-    \[
-    {formula}
-    \]
-    \end{{document}}
-    """
+\documentclass{{article}}
+\usepackage[margin=0pt]{{geometry}}
+\usepackage{{amsmath}}
+\pagestyle{{empty}}
+\begin{{document}}
+\[
+{formula}
+\]
+\end{{document}}
+"""
 
+    # escreve o temp.tex apenas uma vez
     with open("temp.tex", "w") as f:
         f.write(tex_code)
 
@@ -34,5 +38,4 @@ def render_latex(formula: str, output_pdf: str = "output.pdf"):
                 os.remove("temp" + ext)
 
 
-# Exemplo de uso
-# render_latex("$$sq(x) = ( ( ( 40 - x ) \\times x ) + ( x + t ) )$$")
+render_latex("$$ sq(x) = ( ( ( 40 - x ) \\times x ) + ( 5 + 10 ) ) $$")
